@@ -1,0 +1,175 @@
+College Notes Q&A System (RAG) – Progress So Far
+
+Goal of the Project
+The goal of this project is to build a Retrieval-Augmented Generation (RAG) based Question & Answer system for college notes.
+
+Instead of directly asking a Large Language Model (LLM) to answer questions (which can cause hallucinations), the system will first retrieve relevant content from the notes and then generate answers grounded in that content.
+
+This project is being built step by step from scratch to understand each component deeply.
+
+
+What RAG Means (Conceptual Understanding)
+RAG stands for Retrieval-Augmented Generation.
+
+It works in two main stages:
+
+1. Retrieval:
+   Find the most relevant parts of the documents for a given user question.
+
+2. Generation:
+   Give only those relevant parts to the LLM so it can generate a focused and accurate answer.
+
+Key idea:
+LLMs are good at reasoning and explaining, but bad at searching large documents.
+Retrieval solves the search problem. The LLM solves the explanation problem.
+
+
+Why We Cannot Give the Whole Document to the LLM
+
+Giving the entire document every time is not feasible because:
+
+1. Context window limit:
+   LLMs can only read a limited number of tokens at once.
+   Large notes (hundreds of pages) will exceed this limit.
+
+2. Attention cost:
+   Transformers use self-attention, which becomes very slow and expensive for large inputs.
+
+3. Noise and drift:
+   Too much unrelated information causes broader, less precise answers.
+
+4. Lack of control:
+   We cannot control what the LLM focuses on if we give everything.
+
+Therefore, we retrieve only the relevant parts first.
+
+
+What We Have Implemented So Far
+So far, we have implemented the document preprocessing and chunking stage.
+
+Current pipeline stage:
+Raw text notes → Clean, semantic chunks
+
+No embeddings, vector databases, or LLMs yet.
+
+
+
+Input Format
+
+We decided to start with TXT files first because:
+- They are clean
+- No formatting noise
+- Easier to reason about chunking logic
+
+PDF and PPT support can be added later as input adapters.
+
+
+
+Chunking Strategy (Design Decisions)
+-----------------------------------
+
+1. Paragraph-based chunking:
+   - Empty lines indicate paragraph boundaries.
+   - Paragraphs usually represent coherent ideas.
+   - Text is split using empty lines, not single line breaks.
+
+2. Semantic priority over fixed size:
+   - Paragraphs are treated as the primary semantic unit.
+   - We do NOT blindly cut text by characters.
+
+3. Size constraint (safety rule):
+   - If a paragraph is too large, it is split into smaller parts.
+   - This prevents extremely large chunks that mix multiple ideas.
+
+4. Overlap:
+   - Overlap is used to preserve continuity between chunks.
+   - Overlap exists only within the same paragraph.
+   - Overlap does NOT leak across paragraphs or topics.
+
+5. Variable chunk size:
+   - Chunk sizes can vary depending on paragraph length.
+   - This is acceptable as long as semantic meaning is preserved.
+
+--------------------------------------------------
+
+Why Chunking Is Important
+-------------------------
+Chunking directly affects retrieval quality.
+
+If chunks are:
+- Too small → embeddings lose meaning.
+- Too large → multiple ideas get mixed and retrieval precision drops.
+
+A good chunk should:
+- Be self-contained
+- Answer one clear question by itself
+- Contain minimal unrelated information
+
+--------------------------------------------------
+
+What We Fixed During Implementation
+-----------------------------------
+
+1. Initially split by single line breaks:
+   Problem:
+   - Broke paragraph structure
+   - Destroyed semantic boundaries
+
+   Fix:
+   - Switched to splitting by empty lines.
+
+2. Overlap leaking across topics:
+   Problem:
+   - Overlap was applied globally.
+   - Caused unrelated topics to mix.
+
+   Fix:
+   - Reset overlap at paragraph boundaries.
+
+3. Blind sliding window:
+   Problem:
+   - Forced all paragraphs to be split.
+   - Violated semantic-first design.
+
+   Fix:
+   - Only split paragraphs when they exceed size constraints.
+
+--------------------------------------------------
+
+Current State of the Code
+------------------------
+- Reads a TXT file
+- Splits text into paragraphs using empty lines
+- Builds chunks paragraph by paragraph
+- Applies overlap only within paragraphs
+- Handles large paragraphs safely
+- Produces a list of clean semantic chunks
+
+--------------------------------------------------
+
+Git and Repository Setup
+------------------------
+- Code is pushed to GitHub
+- .gitignore is added
+- __pycache__/ and *.pyc are ignored
+- .env is ignored even though it does not exist yet
+- Repository is clean and professional
+
+--------------------------------------------------
+
+What Comes Next
+---------------
+Next stage of the project:
+
+1. Load an embedding model
+2. Generate embeddings for each chunk
+3. Inspect embedding shapes and types
+4. Manually test semantic similarity
+5. Only then move to vector databases (FAISS)
+
+Each component will be added one at a time to avoid confusion.
+
+--------------------------------------------------
+
+End of Current Progress Notes
+-----------------------------
