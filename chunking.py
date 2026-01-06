@@ -7,11 +7,11 @@ chunks=text.split("\n\n")
 
 # print(chunks[:10])
 
-overlap=30
-size=150
+overlap=20
+size=100
 new_chunks=[]
 
-for chunk in chunks:
+for chunk in chunks[:10]:
     words=chunk.split()
     n=len(words)
     if(n==0):continue
@@ -21,7 +21,7 @@ for chunk in chunks:
         new_chunks.append(prev + " " + " ".join(temp))
         prev=" ".join(temp[-overlap:])
 
-print(new_chunks[:10])
+# print(new_chunks[:10])
 
 
 
