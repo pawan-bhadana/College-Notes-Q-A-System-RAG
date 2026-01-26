@@ -64,4 +64,4 @@ This makes the system more **accurate, reliable, and explainable**, especially f
 
 ## 📌 Note
 
-This project is **actively being developed** as a learning-focused and internship-oriented project to explore practical applications of **RAG, embeddings, and large language models**.
+This project is **actively being developed** as a learning-focused project to explore practical applications of **RAG, embeddings, and large language models**.
